@@ -125,7 +125,7 @@ public class ConnectionAuthHandler extends SimpleChannelInboundHandler<Object> {
                 logger.info("receive pong message, address: {}", NettyUtils.parseChannelRemoteAddr(channel));
                 return;
             case MykitChatCode.AUTH_CODE:
-                boolean isSuccess = NettyConnectionManager.saveConnection(channel, json.getString(MykitChatConstants.CONNECTION_NAME));
+                boolean isSuccess = NettyConnectionManager.saveConnection(channel, json.getString(MykitChatConstants.CONN_NAME));
                 NettyConnectionManager.sendSystemMessage(channel, MykitChatCode.SYS_AUTH_STATE,isSuccess);
                 if (isSuccess) {
                     NettyConnectionManager.broadcastSystemMessage(MykitChatCode.SYS_CONNECTION_COUNT, NettyConnectionManager.getAuthConnectionCount());
