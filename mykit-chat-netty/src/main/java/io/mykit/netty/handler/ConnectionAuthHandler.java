@@ -18,6 +18,7 @@ package io.mykit.netty.handler;
 import com.alibaba.fastjson.JSONObject;
 import io.mykit.chat.code.MykitChatCode;
 import io.mykit.chat.config.MykitChatFileLoader;
+import io.mykit.chat.constants.MykitChatConstants;
 import io.mykit.netty.manager.NettyConnectionManager;
 import io.mykit.netty.utils.NettyUtils;
 import io.netty.channel.Channel;
@@ -124,7 +125,7 @@ public class ConnectionAuthHandler extends SimpleChannelInboundHandler<Object> {
                 logger.info("receive pong message, address: {}", NettyUtils.parseChannelRemoteAddr(channel));
                 return;
             case MykitChatCode.AUTH_CODE:
-                boolean isSuccess = NettyConnectionManager.saveConnection(channel, json.getString("nick"));
+                boolean isSuccess = NettyConnectionManager.saveConnection(channel, json.getString(MykitChatConstants.CONNECTION_NAME));
                 NettyConnectionManager.sendSystemMessage(channel, MykitChatCode.SYS_AUTH_STATE,isSuccess);
                 if (isSuccess) {
                     NettyConnectionManager.broadcastSystemMessage(MykitChatCode.SYS_CONNECTION_COUNT, NettyConnectionManager.getAuthConnectionCount());

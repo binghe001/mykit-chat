@@ -51,4 +51,9 @@ public final class MykitChatConstants {
      */
     public static final String CURRENT_TIME = "current_time";
 
+    /**
+     * 客户端传递的连接名称
+     */
+    public static final String CONNECTION_NAME = "connectionName";
+
 }
