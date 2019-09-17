@@ -17,6 +17,7 @@ package io.mykit.netty.manager;
 
 import io.mykit.chat.cache.local.NativeCacheUitls;
 import io.mykit.chat.config.MykitChatFileLoader;
+import io.mykit.chat.constants.MykitChatConstants;
 import io.mykit.chat.entity.ConnectionInfo;
 import io.mykit.chat.proto.wrapper.MykitChatProtoWrapper;
 import io.mykit.chat.utils.common.BlankUitls;
@@ -58,44 +59,60 @@ public class NettyConnectionManager {
     /**
      * 用户认证，这里只是简单的连接名称，之后加入聊天组
      */
-    public static boolean saveConnection(Channel channel, String connectionName){
+    public static String saveConnectionInfo(Channel channel, String connectionName){
+        String connId = MykitChatConstants.DEFAULT_CONNECTION_ID;
         //连接名称不能为空
         if (BlankUitls.isBlank(connectionName)){
             LOGGER.error("connectionName is null...");
-            return false;
+            return connId;
         }
-
         //当前连接名称的缓存中是否存在当前连接名称，连接名称不能重复
         if(NativeCacheUitls.containsConnectionName(connectionName)){
             LOGGER.error("connectionName must not be same...");
-            return false;
+            return connId;
         }
         //获取连接信息
         ConnectionInfo connInfo = NativeCacheUitls.getConnectionInfo(channel);
         //连接信息为空
         if(connInfo == null){
             LOGGER.error("user info is null...");
-            return false;
+            return connId;
         }
 
         //当前channel不活跃
         if(!channel.isActive()){
             LOGGER.error("channel is not active, address: {}, nick: {}", connInfo.getRemoteAddr(), connectionName);
-            return false;
+            return connId;
         }
         //计数器+1
         NativeCacheUitls.incrementCount();
         //新增一个用户的认证信息
         connInfo.setConnectionName(connectionName);
         connInfo.setAuth(true);
-        connInfo.setConnectionId(UUIDUtils.getStringUUID());
+        connId = UUIDUtils.getStringUUID();
+        connInfo.setConnectionId(connId);
         connInfo.setUuid(UUIDUtils.getIntegerUUID());
         connInfo.setTimeStamp(System.currentTimeMillis());
         //将认证后的连接信息重新放入缓存
         NativeCacheUitls.saveConnectionInfo(channel, connInfo);
         //缓存当前客户端连接时用户填写的昵称，之后再次填写昵称时不得重复
         NativeCacheUitls.saveConnectionName(connectionName);
-        return true;
+        return connId;
+    }
+
+
+    /**
+     * 用户认证，这里只是简单的连接名称，之后加入聊天组
+     */
+    public static boolean saveConnection(Channel channel, String connectionName){
+        return !MykitChatConstants.DEFAULT_CONNECTION_ID.equals(saveConnectionInfo(channel, connectionName));
+    }
+
+    /**
+     * 验证认证是否成功
+     */
+    public static boolean isAuthSuccess(String connId){
+        return !MykitChatConstants.DEFAULT_CONNECTION_ID.equals(connId);
     }
 
     /**
@@ -138,6 +155,30 @@ public class NettyConnectionManager {
                         //获取的连接信息不为空，同时当前的连接信息认证过，则发送消息
                         if(connInfo != null && connInfo.getAuth()){
                             channel.writeAndFlush(new TextWebSocketFrame(MykitChatProtoWrapper.buildMessProto(uuid, connName, message)));
+                        }
+                    }
+                }
+
+            }finally {
+                LockUtils.unReadLock();
+            }
+        }
+    }
+    /**
+     * 广播普通分组消息
+     */
+    public static void broadcastGroupMessage(String connId, String connName, String message){
+        //广播的消息不能为空
+        if(!BlankUitls.isBlank(message)){
+            try{
+                LockUtils.readLock();
+                Set<Channel> keySet = NativeCacheUitls.getKeyChannels();
+                if(!BlankUitls.isBlank(keySet)){
+                    for(Channel channel : keySet){
+                        ConnectionInfo connInfo = NativeCacheUitls.getConnectionInfo(channel);
+                        //获取的连接信息不为空，同时当前的连接信息认证过，则发送消息
+                        if(connInfo != null && connInfo.getAuth()){
+                            channel.writeAndFlush(new TextWebSocketFrame(MykitChatProtoWrapper.buildMessProto(connId, connName, message)));
                         }
                     }
                 }
@@ -195,6 +236,13 @@ public class NettyConnectionManager {
      */
     public static void sendSystemMessage(Channel channel, int code, Object message){
         channel.writeAndFlush(new TextWebSocketFrame(MykitChatProtoWrapper.buildSystProto(code, message)));
+    }
+
+    /**
+     * 向单个连接发送消息
+     */
+    public static void sendSystemMessage(Channel channel, int code, String connId,  Object message){
+        channel.writeAndFlush(new TextWebSocketFrame(MykitChatProtoWrapper.buildAuthProto(code, connId, message)));
     }
 
     /**

@@ -72,6 +72,15 @@ public class MykitChatProtoWrapper {
         return JSONObject.toJSONString(chatProto);
     }
 
+
+    public static String buildAuthProto(int code, String connId, Object mess) {
+        MykitChatProto chatProto = new MykitChatProto(SYST_PROTO, null);
+        chatProto.put(MykitChatConstants.CODE, code);
+        chatProto.put(MykitChatConstants.CONN_ID, connId);
+        chatProto.put(MykitChatConstants.MESSAGE, mess);
+        return JSONObject.toJSONString(chatProto);
+    }
+
     public static String buildAuthProto(boolean isSuccess) {
         MykitChatProto chatProto = new MykitChatProto(AUTH_PROTO, null);
         chatProto.put(MykitChatConstants.IS_SUCCESS, isSuccess);
@@ -89,6 +98,14 @@ public class MykitChatProtoWrapper {
         MykitChatProto chatProto = new MykitChatProto(MESS_PROTO, mess);
         chatProto.put(MykitChatConstants.CONN_ID, uid);
         chatProto.put(MykitChatConstants.CONN_NAME, nick);
+        chatProto.put(MykitChatConstants.CURRENT_TIME, DateUtils.parseDateToString(new Date(), DateUtils.TIME_FORMAT));
+        return JSONObject.toJSONString(chatProto);
+    }
+
+    public static String buildMessProto(String connId, String connName, String mess) {
+        MykitChatProto chatProto = new MykitChatProto(MESS_PROTO, mess);
+        chatProto.put(MykitChatConstants.CONN_ID, connId);
+        chatProto.put(MykitChatConstants.CONN_NAME, connName);
         chatProto.put(MykitChatConstants.CURRENT_TIME, DateUtils.parseDateToString(new Date(), DateUtils.TIME_FORMAT));
         return JSONObject.toJSONString(chatProto);
     }

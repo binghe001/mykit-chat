@@ -56,4 +56,9 @@ public final class MykitChatConstants {
      */
     public static final String CONNECTION_NAME = "connectionName";
 
+    /**
+     * 默认的UUID为-1
+     */
+    public static final String DEFAULT_CONNECTION_ID = "default_connection_id";
+
 }

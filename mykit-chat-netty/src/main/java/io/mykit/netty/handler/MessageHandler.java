@@ -41,7 +41,7 @@ public class MessageHandler extends SimpleChannelInboundHandler<TextWebSocketFra
         if(connInfo != null && connInfo.getAuth()){
             JSONObject jsonObject = JSONObject.parseObject(textWebSocketFrame.text());
             //广播返回用户发送的消息文本
-            NettyConnectionManager.broadcastGroupMessage(connInfo.getUuid(), connInfo.getConnectionName(), jsonObject.getString(MykitChatConstants.MESSAGE));
+            NettyConnectionManager.broadcastGroupMessage(connInfo.getConnectionId(), connInfo.getConnectionName(), jsonObject.getString(MykitChatConstants.MESSAGE));
         }
     }
 
