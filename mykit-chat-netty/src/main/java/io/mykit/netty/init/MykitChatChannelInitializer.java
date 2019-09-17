@@ -33,8 +33,10 @@ import io.netty.handler.timeout.IdleStateHandler;
  */
 public class MykitChatChannelInitializer extends ChannelInitializer<SocketChannel> {
     private DefaultEventLoopGroup defaultEventLoopGroup;
-    public MykitChatChannelInitializer(DefaultEventLoopGroup defaultEventLoopGroup){
+    private String webSocketUrl;
+    public MykitChatChannelInitializer(DefaultEventLoopGroup defaultEventLoopGroup, String webSocketUrl){
         this.defaultEventLoopGroup = defaultEventLoopGroup;
+        this.webSocketUrl = webSocketUrl;
     }
     @Override
     protected void initChannel(SocketChannel socketChannel) throws Exception {
@@ -43,7 +45,7 @@ public class MykitChatChannelInitializer extends ChannelInitializer<SocketChanne
                 new HttpObjectAggregator(65536),     //将多个消息转换成单一的消息对象的最大长度
                 new ChunkedWriteHandler(),    //支持异步发送大的码流，一般用于发送文件流
                 new IdleStateHandler(60, 0, 0),    //检测链路是否读空闲
-                new ConnectionAuthHandler(),    //处理握手和认证
+                new ConnectionAuthHandler(this.webSocketUrl),    //处理握手和认证
                 new MessageHandler()    //处理消息的认证
         );
     }

@@ -15,7 +15,6 @@
  */
 package io.mykit.netty.server;
 
-import io.mykit.chat.config.MykitChatFileLoader;
 import io.mykit.netty.manager.NettyConnectionManager;
 import io.mykit.netty.server.base.MykitChatBaseServer;
 import io.mykit.netty.server.base.NettyServer;
@@ -36,11 +35,9 @@ public class MykitChatServer extends MykitChatBaseServer implements NettyServer 
 
     private ScheduledExecutorService executorService;
 
-    public MykitChatServer(){
-        super();
+    public MykitChatServer(String host, Integer port){
+        super(host, port);
         executorService = Executors.newScheduledThreadPool(2);
-        //初始化
-        this.init();
     }
 
     @Override
@@ -48,9 +45,7 @@ public class MykitChatServer extends MykitChatBaseServer implements NettyServer 
         super.start();
         try {
             channelFuture = serverBootstrap.bind().sync();
-            logger.info("Mykit chat system start success, hostname is:{},  port is:{}",
-                    MykitChatFileLoader.getStringValueByKey(MykitChatFileLoader.DEFAULT_HOST),
-                    MykitChatFileLoader.getIntValueByKey(MykitChatFileLoader.DEFAULT_PORT));
+            logger.info("Mykit chat system start success, hostname is:{},  port is:{}", host, port);
 
             // 定时扫描所有的Channel，关闭失效的Channel
             executorService.scheduleAtFixedRate(new Runnable() {

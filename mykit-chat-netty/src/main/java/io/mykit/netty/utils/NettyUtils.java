@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 package io.mykit.netty.utils;
+
 import io.netty.channel.Channel;
+
 import java.net.SocketAddress;
 
 /**
@@ -46,5 +48,18 @@ public class NettyUtils {
         }
 
         return "";
+    }
+
+    /**
+     * 获取WebSocket URL地址
+     */
+    public static String getWebSocketUrl(String host, Integer port){
+        StringBuilder sb = new StringBuilder();
+        sb.append("ws://");
+        sb.append(host);
+        sb.append(":");
+        sb.append(port);
+        sb.append("/websocket");
+        return sb.toString();
     }
 }

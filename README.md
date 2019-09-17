@@ -51,7 +51,16 @@ mykit-chat是基于Netty实现的实时聊天系统服务器端，目前实现�
 ```mvn clean package install```  
 5. 将mykit-chat-core模块下的target目录下的mykit-chat-core-1.0.0-SNAPSHOT-jar-with-dependencies.jar复制到需要运行项目的目录  
 6. 执行如下命令运行mykit-chat服务端  
-```nohup java -jar mykit-chat-core-1.0.0-SNAPSHOT-jar-with-dependencies.jar >> /dev/null &```
+```nohup java -jar mykit-chat-core-1.0.0-SNAPSHOT-jar-with-dependencies.jar >> /dev/null &```  
+7. 项目支持在启动时动态设置主机名（IP地址）和端口，如果需要在启动的时候动态设置主机名和端口，则可以使用如下命令形式启动项目  
+```nohup java -jar mykit-chat-core-1.0.0-SNAPSHOT-jar-with-dependencies.jar hostname(ip) port >> /dev/null &```  
+如果在启动时，没有动态设置主机名（IP地址）和端口，则使用默认的主机名（IP地址）和端口，默认的主机名（IP地址）和端口在mykit-chat-config模块下的
+src/main/resources目录下的websocket.properties文件中进行配置，默认的配置项如下所示：  
+```
+default_host=localhost
+default_port=8099
+websocket_url=ws://localhost:8099/websocket
+```
 
 # 注意事项
 1. 目前项目只是一个简单的聊天模型，需要不断优化升级；  

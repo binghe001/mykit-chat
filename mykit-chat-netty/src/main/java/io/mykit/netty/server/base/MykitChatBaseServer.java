@@ -16,15 +16,15 @@
 package io.mykit.netty.server.base;
 
 import io.mykit.chat.config.MykitChatFileLoader;
+import io.mykit.chat.utils.common.BlankUitls;
 import io.mykit.netty.init.MykitChatChannelInitializer;
+import io.mykit.netty.utils.NettyUtils;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.DefaultEventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.ThreadFactory;
@@ -36,20 +36,34 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @description 基础的服务器类，实现NettyServer接口
  */
 public abstract class MykitChatBaseServer implements NettyServer{
-    private final Logger logger = LoggerFactory.getLogger(MykitChatBaseServer.class);
-    protected String host = MykitChatFileLoader.getStringValueByKey(MykitChatFileLoader.DEFAULT_HOST);
-    protected Integer port = MykitChatFileLoader.getIntValueByKey(MykitChatFileLoader.WEB_SOCKET_PORT);
+    protected String host;
+    protected Integer port;
     protected DefaultEventLoopGroup defaultEventLoopGroup;
     protected NioEventLoopGroup bossEventLoopGroup;
     protected NioEventLoopGroup workEventLoopGroup;
     protected NioServerSocketChannel serverSocketChannel;
     protected ChannelFuture channelFuture;
     protected ServerBootstrap serverBootstrap;
+    private String webSocketUrl;
 
+    public MykitChatBaseServer(String host, Integer port){
+        if(!BlankUitls.isBlank(host)){
+            this.host = host;
+        }else{
+            this.host = MykitChatFileLoader.getStringValueByKey(MykitChatFileLoader.DEFAULT_HOST);
+        }
+        if(!BlankUitls.isBlank(port)){
+            this.port = port;
+        }else{
+            this.port = MykitChatFileLoader.getIntValueByKey(MykitChatFileLoader.DEFAULT_PORT);
+        }
+        this.webSocketUrl = NettyUtils.getWebSocketUrl(this.host, this.port);
+        this.init();
+    }
     /**
      * 初始化方法
      */
-    protected void init(){
+    private void init(){
         defaultEventLoopGroup = new DefaultEventLoopGroup(8, new ThreadFactory() {
             private AtomicInteger index = new AtomicInteger(0);
 
@@ -86,7 +100,7 @@ public abstract class MykitChatBaseServer implements NettyServer{
                 .option(ChannelOption.TCP_NODELAY, true)
                 .option(ChannelOption.SO_BACKLOG, 1024)
                 .localAddress(new InetSocketAddress(host, port))
-                .childHandler(new MykitChatChannelInitializer(defaultEventLoopGroup));
+                .childHandler(new MykitChatChannelInitializer(this.defaultEventLoopGroup, this.webSocketUrl));
     }
 
     @Override

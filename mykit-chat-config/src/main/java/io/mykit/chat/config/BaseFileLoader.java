@@ -27,14 +27,10 @@ public class BaseFileLoader {
      */
     public static final String DEFAULT_HOST = "default_host";
     /**
-     * 默认端口为8088
+     * 默认端口为8099
      */
     public static final String DEFAULT_PORT = "default_port";
 
-    /**
-     * WebSocket发布的端口号默认为8099
-     */
-    public static final String WEB_SOCKET_PORT = "web_socket_port";
     /**
      * 默认WebSocket发布地址，端口为8099
      */

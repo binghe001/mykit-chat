@@ -19,6 +19,7 @@ import com.alibaba.fastjson.JSONObject;
 import io.mykit.chat.code.MykitChatCode;
 import io.mykit.chat.config.MykitChatFileLoader;
 import io.mykit.chat.constants.MykitChatConstants;
+import io.mykit.chat.utils.common.BlankUitls;
 import io.mykit.netty.manager.NettyConnectionManager;
 import io.mykit.netty.utils.NettyUtils;
 import io.netty.channel.Channel;
@@ -39,6 +40,18 @@ import org.slf4j.LoggerFactory;
 public class ConnectionAuthHandler extends SimpleChannelInboundHandler<Object> {
     private final Logger logger = LoggerFactory.getLogger(ConnectionAuthHandler.class);
     private WebSocketServerHandshaker handshaker;
+
+    private String webSocketUrl;
+
+    public ConnectionAuthHandler(String webSocketUrl){
+        super();
+        if(!BlankUitls.isBlank(webSocketUrl)){
+            this.webSocketUrl = webSocketUrl;
+        }else{
+            this.webSocketUrl =  MykitChatFileLoader.getStringValueByKey(MykitChatFileLoader.WEBSOCKET_URL);
+        }
+
+    }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
@@ -73,8 +86,7 @@ public class ConnectionAuthHandler extends SimpleChannelInboundHandler<Object> {
             ctx.channel().close();
             return;
         }
-        WebSocketServerHandshakerFactory handshakerFactory = new WebSocketServerHandshakerFactory(
-                MykitChatFileLoader.getStringValueByKey(MykitChatFileLoader.WEBSOCKET_URL), null, true);
+        WebSocketServerHandshakerFactory handshakerFactory = new WebSocketServerHandshakerFactory(this.webSocketUrl, null, true);
         handshaker = handshakerFactory.newHandshaker(request);
         if (handshaker == null) {
             WebSocketServerHandshakerFactory.sendUnsupportedVersionResponse(ctx.channel());
