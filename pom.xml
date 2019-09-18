@@ -25,6 +25,7 @@
         <slf4j.version>1.7.2</slf4j.version>
         <netty.version>4.1.39.Final</netty.version>
         <fastjson.version>1.2.59</fastjson.version>
+        <redis.version>2.9.0</redis.version>
     </properties>
 
     <dependencies>
@@ -32,6 +33,12 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>${slf4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>${redis.version}</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
