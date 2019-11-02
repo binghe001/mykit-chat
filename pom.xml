@@ -23,7 +23,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jdk.version>1.8</jdk.version>
         <slf4j.version>1.7.2</slf4j.version>
-        <netty.version>4.1.39.Final</netty.version>
+        <netty.version>4.1.42.Final</netty.version>
         <fastjson.version>1.2.59</fastjson.version>
         <redis.version>2.9.0</redis.version>
     </properties>
